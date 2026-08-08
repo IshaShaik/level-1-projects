@@ -3,881 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice Navigator</title>
-    <!-- Google Fonts for Futuristic Tech Aesthetic -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Voice Directed Web Portal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         /* ==========================================
-           1. CSS VARIABLES & THEME SETUP
+           1. CSS VARIABLES & BASE STYLES
            ========================================== */
         :root {
-            --bg-dark: #030712;
-            --bg-card: rgba(10, 18, 42, 0.65);
-            --cyan-glow: #00f0ff;
-            --blue-glow: #0066ff;
-            --purple-glow: #9d00ff;
-            --text-main: #f0f6fc;
-            --text-dim: #8b949e;
-            --border-glass: rgba(0, 240, 255, 0.2);
-            --font-head: 'Orbitron', sans-serif;
-            --font-body: 'Rajdhani', sans-serif;
-            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 31, 48, 0.7);
+            --accent-primary: #00f2fe;
+            --accent-secondary: #4facfe;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --nav-height: 80px;
         }
 
-        /* ==========================================
-           2. RESET & BASE STYLES
-           ========================================== */
-        *, *::before, *::after {
-            box-sizing: border-box;
+        * {
             margin: 0;
             padding: 0;
-        }
-
-        html {
+            box-sizing: border-box;
             scroll-behavior: smooth;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: var(--font-body);
-            font-size: 18px;
-            overflow-x: hidden;
         }
 
         body {
-            min-height: 100vh;
-            position: relative;
-            background: radial-gradient(circle at 50% 10%, #0d1b3e 0%, var(--bg-dark) 75%);
-        }
-
-        /* Ambient Animated Grid Background */
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-size: 50px 50px;
-            background-image: 
-                linear-gradient(to right, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* Glassmorphism Helper */
-        .glass-panel {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6),
-                        inset 0 0 15px rgba(0, 240, 255, 0.05);
-            transition: var(--transition-smooth);
-        }
-
-        .glass-panel:hover {
-            border-color: rgba(0, 240, 255, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(0, 240, 255, 0.2),
-                        inset 0 0 20px rgba(0, 240, 255, 0.1);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
         /* ==========================================
-           3. NAVIGATION BAR
+           2. NAVIGATION BAR
            ========================================== */
         header {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1100px;
-            z-index: 1000;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 28px;
-        }
-
-        .logo {
-            font-family: var(--font-head);
-            font-weight: 900;
-            font-size: 1.3rem;
-            letter-spacing: 2px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .logo-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--cyan-glow);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--cyan-glow);
-            animation: pulse-dot 2s infinite;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 12px;
-            list-style: none;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-dim);
-            font-family: var(--font-head);
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: var(--transition-smooth);
-            position: relative;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: var(--cyan-glow);
-            background: rgba(0, 240, 255, 0.1);
-            text-shadow: 0 0 8px var(--cyan-glow);
-        }
-
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 2px;
-            background: var(--cyan-glow);
-            box-shadow: 0 0 10px var(--cyan-glow);
-        }
-
-        /* ==========================================
-           4. MAIN CONTENT SECTIONS
-           ========================================== */
-        main {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 120px 20px 80px;
-        }
-
-        section {
-            min-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 60px 0;
-            opacity: 0.4;
-            transform: scale(0.98);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            scroll-margin-top: 100px;
-        }
-
-        section.active-section {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .section-title {
-            font-family: var(--font-head);
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: 3px;
-            margin-bottom: 12px;
-            text-align: center;
-            background: linear-gradient(135deg, #ffffff 0%, var(--cyan-glow) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-        }
-
-        .section-subtitle {
-            color: var(--text-dim);
-            font-size: 1.05rem;
-            text-align: center;
-            max-width: 600px;
-            margin-bottom: 35px;
-            letter-spacing: 1px;
-        }
-
-        /* ==========================================
-           5. HOME SECTION & MICROPHONE INTERFACE
-           ========================================== */
-        .hero-title {
-            font-family: var(--font-head);
-            font-size: 3.2rem;
-            font-weight: 900;
-            text-align: center;
-            letter-spacing: 4px;
-            line-height: 1.15;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #ffffff 0%, var(--cyan-glow) 50%, var(--blue-glow) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .mic-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 35px 0;
-            position: relative;
-        }
-
-        .mic-outer-ring {
-            width: 170px;
-            height: 170px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, rgba(0,0,0,0) 70%);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
-            animation: pulse-ring 4s infinite ease-in-out;
-        }
-
-        .mic-button {
-            width: 115px;
-            height: 115px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(10, 18, 42, 0.95), rgba(3, 7, 18, 0.95));
-            border: 2px solid var(--cyan-glow);
-            color: var(--cyan-glow);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            outline: none;
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.2);
-            transition: var(--transition-smooth);
-        }
-
-        .mic-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px var(--cyan-glow), inset 0 0 25px var(--cyan-glow);
-            color: #fff;
-        }
-
-        .mic-button:active {
-            transform: scale(0.95);
-        }
-
-        .mic-icon-svg {
-            width: 48px;
-            height: 48px;
-            fill: currentColor;
-            filter: drop-shadow(0 0 8px var(--cyan-glow));
-        }
-
-        .mic-labels {
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .mic-label-title {
-            font-family: var(--font-head);
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: var(--cyan-glow);
-        }
-
-        .mic-label-sub {
-            font-size: 0.9rem;
-            color: var(--text-dim);
-            margin-top: 4px;
-        }
-
-        /* Voice Status Indicator Panel */
-        .status-panel {
-            margin-top: 20px;
-            padding: 10px 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-radius: 30px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--cyan-glow);
-            box-shadow: 0 0 10px var(--cyan-glow);
-            transition: background 0.3s, box-shadow 0.3s;
-        }
-
-        .status-dot.processing {
-            background: #ffaa00;
-            box-shadow: 0 0 10px #ffaa00;
-            animation: pulse-dot 0.6s infinite alternate;
-        }
-
-        .status-dot.speaking {
-            background: var(--purple-glow);
-            box-shadow: 0 0 10px var(--purple-glow);
-            animation: pulse-dot 0.8s infinite;
-        }
-
-        .status-text {
-            font-family: var(--font-head);
-            font-size: 0.85rem;
-            letter-spacing: 1.5px;
-            color: var(--text-main);
-        }
-
-        /* Command Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            width: 100%;
-            margin-top: 30px;
-        }
-
-        .command-card {
-            padding: 22px 18px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .command-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card-tag {
-            font-family: var(--font-head);
-            font-size: 0.75rem;
-            color: var(--purple-glow);
-            letter-spacing: 1.5px;
-            font-weight: 700;
-        }
-
-        .card-cmd {
-            font-family: var(--font-head);
-            font-size: 0.95rem;
-            color: var(--cyan-glow);
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        /* ==========================================
-           6. ABOUT SECTION
-           ========================================== */
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .tech-card {
-            padding: 18px;
-            text-align: center;
-            font-family: var(--font-head);
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: 1px;
-            border-color: rgba(157, 0, 255, 0.25);
-        }
-
-        .tech-card:hover {
-            border-color: var(--purple-glow);
-            box-shadow: 0 0 20px rgba(157, 0, 255, 0.3);
-        }
-
-        /* ==========================================
-           7. AI SECTION & NETWORK VISUALIZER
-           ========================================== */
-        .ai-network {
-            width: 100%;
-            max-width: 650px;
-            height: 280px;
-            position: relative;
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .ai-node {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: var(--font-head);
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: 1px;
-            z-index: 2;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
-        }
-
-        .node-voice { top: 15px; left: 8%; border: 2px solid var(--cyan-glow); background: rgba(0, 240, 255, 0.1); }
-        .node-python { top: 15px; right: 8%; border: 2px solid #3776ab; background: rgba(55, 118, 171, 0.1); }
-        .node-web { bottom: 15px; left: 18%; border: 2px solid #e34f26; background: rgba(227, 79, 38, 0.1); }
-        .node-ai { bottom: 15px; right: 18%; border: 2px solid var(--purple-glow); background: rgba(157, 0, 255, 0.1); }
-
-        .ai-core {
-            width: 95px;
-            height: 95px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--cyan-glow) 0%, var(--blue-glow) 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: var(--font-head);
-            font-weight: 900;
-            font-size: 1.1rem;
-            color: #000;
-            box-shadow: 0 0 35px var(--cyan-glow);
-            animation: pulse-ring 2.5s infinite ease-in-out;
-            z-index: 3;
-        }
-
-        .ai-lines {
-            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            z-index: 1;
+            height: var(--nav-height);
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
         }
 
-        /* ==========================================
-           8. CONTACT SECTION
-           ========================================== */
-        .contact-card {
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 0;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            max-width: 550px;
-            padding: 35px;
-            text-align: center;
+            height: 2px;
+            background: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-primary);
         }
 
-        .contact-box {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: rgba(0, 240, 255, 0.05);
-            border: 1px solid var(--cyan-glow);
-            color: var(--cyan-glow);
-            font-family: var(--font-head);
-            letter-spacing: 1px;
+        .mic-indicator {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .mic-indicator i {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
 
         /* ==========================================
-           9. TOAST NOTIFICATION
+           3. SECTIONS LAYOUT
            ========================================== */
-        #toast {
+        section {
+            min-height: 100vh;
+            padding: calc(var(--nav-height) + 40px) 10% 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .section-title span {
+            color: var(--accent-primary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-top: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* ==========================================
+           4. TOAST NOTIFICATION
+           ========================================== */
+        #toast-container {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            padding: 16px 26px;
             z-index: 2000;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transform: translateY(150%);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none;
         }
 
-        #toast.show {
+        .toast {
+            background: rgba(15, 23, 42, 0.95);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 8px;
+            padding: 16px 24px;
+            color: var(--text-main);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .toast.show {
             transform: translateY(0);
             opacity: 1;
         }
 
-        .toast-icon {
-            font-size: 1.2rem;
-            color: var(--cyan-glow);
+        .toast i {
+            font-size: 1.5rem;
+            color: var(--accent-primary);
         }
 
-        .toast-title {
-            font-family: var(--font-head);
-            font-size: 0.85rem;
-            color: var(--cyan-glow);
+        .toast-content h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
             letter-spacing: 1px;
+            color: var(--accent-primary);
         }
 
-        .toast-message {
-            font-size: 0.95rem;
-            color: var(--text-main);
-        }
-
-        /* ==========================================
-           10. ANIMATIONS & KEYFRAMES
-           ========================================== */
-        @keyframes pulse-dot {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
-            50% { box-shadow: 0 0 35px rgba(0, 240, 255, 0.5); }
-            100% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
-        }
-
-        /* ==========================================
-           11. RESPONSIVE MEDIA QUERIES
-           ========================================== */
-        @media (max-width: 768px) {
-            header { top: 12px; width: 94%; }
-            nav { padding: 10px 16px; }
-            .logo { font-size: 1rem; }
-            .nav-links { gap: 4px; }
-            .nav-link { font-size: 0.72rem; padding: 6px 10px; }
-
-            .hero-title { font-size: 2.2rem; }
-            .section-title { font-size: 1.7rem; }
-
-            .mic-outer-ring { width: 140px; height: 140px; }
-            .mic-button { width: 95px; height: 95px; }
-            .mic-icon-svg { width: 38px; height: 38px; }
-
-            .cards-grid { grid-template-columns: repeat(2, 1fr); }
-
-            .ai-network { height: 230px; }
-            .ai-node { width: 62px; height: 62px; font-size: 0.65rem; }
-            .ai-core { width: 75px; height: 75px; font-size: 0.85rem; }
-
-            #toast { left: 20px; right: 20px; bottom: 20px; }
-        }
-
-        @media (max-width: 480px) {
-            .cards-grid { grid-template-columns: 1fr; }
-            .logo span { display: none; }
+        .toast-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
 
-    <!-- Ambient Grid Effect -->
-    <div class="bg-grid"></div>
-
-    <!-- Fixed Futuristic Glass Navigation Bar -->
+    <!-- Header Navigation -->
     <header>
-        <nav class="glass-panel">
-            <a href="#home" class="logo">
-                <div class="logo-dot"></div>
-                <span>AI VOICE</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="#home" class="nav-link active" id="nav-home">HOME</a></li>
-                <li><a href="#about" class="nav-link" id="nav-about">ABOUT</a></li>
-                <li><a href="#ai" class="nav-link" id="nav-ai">AI</a></li>
-                <li><a href="#contact" class="nav-link" id="nav-contact">CONTACT</a></li>
+        <div class="logo">
+            <i class="fa-solid fa-robot"></i> VOICE WEB
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home" id="nav-home" class="active">Home</a></li>
+                <li><a href="#about" id="nav-about">About</a></li>
+                <li><a href="#ai" id="nav-ai">AI Features</a></li>
+                <li><a href="#contact" id="nav-contact">Contact</a></li>
             </ul>
         </nav>
+        <div class="mic-indicator" id="mic-btn">
+            <i class="fa-solid fa-microphone"></i> Python Listening
+        </div>
     </header>
 
-    <!-- Main Section Container -->
-    <main>
+    <!-- Sections -->
+    <section id="home">
+        <h1 class="section-title">Voice Control <span> Dashboard</span></h1>
+        <p style="color: var(--text-muted);">Speak commands into your Python backend to navigate effortlessly across this portal.</p>
+        <div class="card">
+            <h3><i class="fa-solid fa-terminal" style="color: var(--accent-primary);"></i> How It Works</h3>
+            <p style="margin-top: 10px; color: var(--text-muted);">
+                1. Run your local Python script.<br>
+                2. Say commands like <b>"Open About Page"</b>, <b>"Go to AI"</b>, or <b>"Contact Page"</b>.<br>
+                3. The browser receives parameters, smoothly scrolls to the section, and speaks confirmation back to you.
+            </p>
+        </div>
+    </section>
 
-        <!-- ================= HOME SECTION ================= -->
-        <section id="home" class="active-section">
-            <h1 class="hero-title">AI VOICE NAVIGATOR</h1>
-            <p class="section-subtitle">Control your web experience using simple voice commands.</p>
+    <section id="about">
+        <h1 class="section-title">About <span>System</span></h1>
+        <div class="card">
+            <p style="color: var(--text-muted);">
+                This project combines Python speech recognition (`speech_recognition`) with web automation (`webbrowser`) and client-side SpeechSynthesis API to deliver hands-free web navigation.
+            </p>
+        </div>
+    </section>
 
-            <!-- Interactive Glowing Microphone Interface -->
-            <div class="mic-container">
-                <div class="mic-outer-ring">
-                    <button class="mic-button" id="mic-btn" aria-label="Voice Control Button">
-                        <svg class="mic-icon-svg" viewBox="0 0 24 24">
-                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.34 1.34 3 3 3z"/>
-                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="mic-labels">
-                    <div class="mic-label-title">VOICE CONTROL</div>
-                    <div class="mic-label-sub">Speak through the Python Voice Controller.</div>
-                </div>
+    <section id="ai">
+        <h1 class="section-title">AI <span>Capabilities</span></h1>
+        <div class="card">
+            <p style="color: var(--text-muted);">
+                Intelligent routing interprets key phrases from raw spoken language, triggering URL parameters (`?voice=true`) to automate user interfaces smoothly.
+            </p>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h1 class="section-title">Contact <span>Us</span></h1>
+        <div class="card">
+            <p style="color: var(--text-muted);">
+                Get in touch or trigger this section anytime using your voice controller.
+            </p>
+        </div>
+    </section>
+
+    <!-- Notification Toast -->
+    <div id="toast-container">
+        <div class="toast" id="toast">
+            <i class="fa-solid fa-volume-high"></i>
+            <div class="toast-content">
+                <h4 id="toast-title">VOICE ACTION</h4>
+                <p id="toast-msg">Navigated using voice command</p>
             </div>
-
-            <!-- Status Panel -->
-            <div class="status-panel glass-panel">
-                <div class="status-dot" id="status-dot"></div>
-                <div class="status-text" id="status-text">● VOICE SYSTEM READY</div>
-            </div>
-
-            <!-- Command Cards Grid -->
-            <div class="cards-grid">
-                <a href="#home" class="glass-panel command-card">
-                    <span class="card-tag">HOME</span>
-                    <span class="card-cmd">"Open Home Page"</span>
-                </a>
-                <a href="#about" class="glass-panel command-card">
-                    <span class="card-tag">ABOUT</span>
-                    <span class="card-cmd">"Open About Page"</span>
-                </a>
-                <a href="#ai" class="glass-panel command-card">
-                    <span class="card-tag">AI</span>
-                    <span class="card-cmd">"Open AI Page"</span>
-                </a>
-                <a href="#contact" class="glass-panel command-card">
-                    <span class="card-tag">CONTACT</span>
-                    <span class="card-cmd">"Open Contact Page"</span>
-                </a>
-            </div>
-        </section>
-
-        <!-- ================= ABOUT SECTION ================= -->
-        <section id="about">
-            <h2 class="section-title">ABOUT THE PROJECT</h2>
-            <p class="section-subtitle">This project demonstrates how Python voice commands can control a web experience.</p>
-
-            <div class="tech-grid">
-                <div class="glass-panel tech-card">PYTHON</div>
-                <div class="glass-panel tech-card">VOICE MODULE</div>
-                <div class="glass-panel tech-card">DICTIONARY</div>
-                <div class="glass-panel tech-card">HTML</div>
-                <div class="glass-panel tech-card">CSS</div>
-                <div class="glass-panel tech-card">JAVASCRIPT</div>
-            </div>
-        </section>
-
-        <!-- ================= AI SECTION ================= -->
-        <section id="ai">
-            <h2 class="section-title">AI EXPERIENCE</h2>
-            <p class="section-subtitle">Voice commands can be converted into actions using Python and web technology.</p>
-
-            <!-- Network Visualizer -->
-            <div class="ai-network">
-                <svg class="ai-lines">
-                    <line x1="18%" y1="20%" x2="50%" y2="50%" stroke="rgba(0,240,255,0.4)" stroke-width="2" stroke-dasharray="4,4"/>
-                    <line x1="82%" y1="20%" x2="50%" y2="50%" stroke="rgba(55,118,171,0.4)" stroke-width="2" stroke-dasharray="4,4"/>
-                    <line x1="25%" y1="80%" x2="50%" y2="50%" stroke="rgba(227,79,38,0.4)" stroke-width="2" stroke-dasharray="4,4"/>
-                    <line x1="75%" y1="80%" x2="50%" y2="50%" stroke="rgba(157,0,255,0.4)" stroke-width="2" stroke-dasharray="4,4"/>
-                </svg>
-                <div class="ai-node node-voice">VOICE</div>
-                <div class="ai-node node-python">PYTHON</div>
-                <div class="ai-core">WEB</div>
-                <div class="ai-node node-web">HTML</div>
-                <div class="ai-node node-ai">AI</div>
-            </div>
-        </section>
-
-        <!-- ================= CONTACT SECTION ================= -->
-        <section id="contact">
-            <h2 class="section-title">CONTACT</h2>
-            <div class="glass-panel contact-card">
-                <p class="section-subtitle" style="margin-bottom: 0;">Interactive Voice Navigation Interface</p>
-                <div class="contact-box">
-                    Your Contact page is ready.
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Toast Notification Overlay -->
-    <div id="toast" class="glass-panel">
-        <span class="toast-icon">✓</span>
-        <div>
-            <div class="toast-title" id="toast-title">NOTIFICATION</div>
-            <div class="toast-message" id="toast-message">Page opened successfully.</div>
         </div>
     </div>
 
-    <!-- JavaScript Implementation -->
+    <!-- JavaScript Logic -->
     <script>
         /* ==========================================
-           1. ROUTE DEFINITIONS
+           1. VOICE SPEECH FEEDBACK (TEXT-TO-SPEECH)
            ========================================== */
-        const routes = {
-            '#home': {
-                navId: 'nav-home',
-                sectionId: 'home',
-                speech: 'Your home page is open.',
-                toastTitle: 'HOME PAGE OPEN',
-                toastMsg: 'Your home page is open'
-            },
-            '#about': {
-                navId: 'nav-about',
-                sectionId: 'about',
-                speech: 'Your about page is open.',
-                toastTitle: 'ABOUT PAGE OPEN',
-                toastMsg: 'Your about page is open'
-            },
-            '#ai': {
-                navId: 'nav-ai',
-                sectionId: 'ai',
-                speech: 'Your AI page is open.',
-                toastTitle: 'AI PAGE OPEN',
-                toastMsg: 'Your AI page is open'
-            },
-            '#contact': {
-                navId: 'nav-contact',
-                sectionId: 'contact',
-                speech: 'Your contact page is open.',
-                toastTitle: 'CONTACT PAGE OPEN',
-                toastMsg: 'Your contact page is open'
-            }
-        };
-
-        let toastTimer = null;
-
-        /* ==========================================
-           2. SPEECH SYNTHESIS ENGINE
-           ========================================== */
-        function speakMessage(text, onComplete) {
+        function speakFeedback(text) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Stop any pending speech
-                
+                window.speechSynthesis.cancel(); // Stop ongoing speech
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.95;
+                utterance.rate = 1.0;
                 utterance.pitch = 1.0;
-                utterance.volume = 1.0;
-
-                // Pick a natural English voice if available
-                const voices = window.speechSynthesis.getVoices();
-                const englishVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
-                if (englishVoice) {
-                    utterance.voice = englishVoice;
-                }
-
-                utterance.onend = () => { if (onComplete) onComplete(); };
-                utterance.onerror = () => { if (onComplete) onComplete(); };
-
                 window.speechSynthesis.speak(utterance);
-            } else {
-                if (onComplete) onComplete();
             }
         }
 
         /* ==========================================
-           3. UI HELPERS (STATUS & TOAST)
+           2. TOAST NOTIFICATIONS
            ========================================== */
-        function updateStatus(text, cssClass) {
-            const dot = document.getElementById('status-dot');
-            const textEl = document.getElementById('status-text');
-            
-            dot.className = 'status-dot ' + (cssClass || '');
-            textEl.textContent = text;
-        }
-
         function triggerToast(title, message) {
             const toast = document.getElementById('toast');
-            document.getElementById('toast-title').textContent = title;
-            document.getElementById('toast-message').textContent = message;
-
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = message;
+            
             toast.classList.add('show');
-
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
+            setTimeout(() => {
                 toast.classList.remove('show');
             }, 3500);
         }
 
         /* ==========================================
-           4. ROUTING & NAVIGATION CORE LOGIC
+           3. ROUTING & ACTIVE HIGHLIGHTS
+           ========================================== */
+        function updateActiveNav(targetHash) {
+            const hash = targetHash || '#home';
+            document.querySelectorAll('nav a').forEach(link => {
+                if (link.getAttribute('href') === hash) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        /* ==========================================
+           4. PROCESS VOICE NAVIGATION PARAMETERS
            ========================================== */
         function processNavigation() {
-            const hash = window.location.hash || '#home';
             const urlParams = new URLSearchParams(window.location.search);
-            const isVoice = urlParams.get('voice') === 'true';
+            const isVoice = urlParams.get('voice');
+            const targetHash = window.location.hash || '#home';
 
-            const route = routes[hash] || routes['#home'];
+            updateActiveNav(targetHash);
 
-            // Update UI Links Active State
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            const activeNav = document.getElementById(route.navId);
-            if (activeNav) activeNav.classList.add('active');
+            if (isVoice === 'true') {
+                const pageName = targetHash.replace('#', '').toUpperCase();
+                const speechMsg = `Your ${pageName} page is open.`;
 
-            // Scroll & Highlight Active Section
-            document.querySelectorAll('section').forEach(sec => sec.classList.remove('active-section'));
-            const targetSection = document.getElementById(route.sectionId);
-            if (targetSection) {
-                targetSection.classList.add('active-section');
-                targetSection.scrollIntoView({ behavior: 'smooth' });
-            }
+                triggerToast("VOICE COMMAND DETECTED", speechMsg);
+                speakFeedback(speechMsg);
 
-            // BRANCH LOGIC: Python Voice Command vs Normal Click
-            if (isVoice) {
-                // Show notification for Voice Command
-                triggerToast(route.toastTitle, route.toastMsg);
-
-                // Clean the URL (remove ?voice=true) without page reload or breaking history
-                const cleanURL = window.location.origin + window.location.pathname + hash;
-                window.history.replaceState(null, '', cleanURL);
-
-                // Animated Voice Status Sequence
-                updateStatus('● COMMAND RECEIVED', 'processing');
-
-                setTimeout(() => {
-                    updateStatus('● OPENING PAGE', 'processing');
-
-                    setTimeout(() => {
-                        updateStatus('● VOICE RESPONSE', 'speaking');
-                        
-                        // Speak the voice response
-                        speakMessage(route.speech, () => {
-                            updateStatus('● VOICE SYSTEM READY', '');
-                        });
-                    }, 400);
-                }, 300);
-            } else {
-                // NORMAL CLICK NAVIGATION: Remain completely silent!
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                }
-                updateStatus('● VOICE SYSTEM READY', '');
+                // Clean URL parameters without page refresh
+                const newUrl = window.location.pathname + targetHash;
+                window.history.replaceState({}, document.title, newUrl);
             }
         }
 
         /* ==========================================
-           5. EVENT LISTENERS
+           5. EVENT LISTENERS & INITIALIZATION
            ========================================== */
-        // Listen for Hash Changes
+        // Listen for URL hash changes when Python opens new pages
         window.addEventListener('hashchange', processNavigation);
 
-        // Manual Microphone Button Handler (Visual Only)
-        document.getElementById('mic-btn').addEventListener('click', () => {
-            triggerToast('PYTHON CONTROLLER REQUIRED', 'Run the Python Voice Controller to speak commands.');
-            updateStatus('● RUN PYTHON PROGRAM', 'processing');
-            
-            setTimeout(() => {
-                updateStatus('● VOICE SYSTEM READY', '');
-            }, 2500);
-        });
-
-        // Initialize Page on Load
+        // Process routing when page finishes loading
         window.addEventListener('DOMContentLoaded', () => {
-            // Load voices ahead of time
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.onvoiceschanged = () => {
-                    window.speechSynthesis.getVoices();
-                };
-            }
             processNavigation();
+
+            // Mic button indicator click message
+            const micBtn = document.getElementById('mic-btn');
+            if (micBtn) {
+                micBtn.addEventListener('click', () => {
+                    triggerToast('VOICE CONTROLLER ACTIVE', 'Run your Python script to speak commands.');
+                });
+            }
         });
     </script>
 </body>
