@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Computer Sees an Image — Image → Pixels → NumPy → AI</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Steps Flow Bar */
+        .steps-bar {
+            display: flex;
+            justify-content: space-between;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            gap: 1rem;
+        }
+
+        .step-item {
+            text-align: center;
+            flex: 1;
+            min-width: 110px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .step-item span {
+            display: block;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 0.2rem;
+        }
+
+        /* Main Grid Workspace */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Controls */
+        .upload-section {
+            margin-bottom: 1rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            transition: background 0.2s, transform 0.1s;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        /* Canvas & Display Area */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed var(--border);
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .placeholder-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        /* Inspector Panel */
+        .inspector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-box {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-top: 0.2rem;
+        }
+
+        /* NumPy Matrix Preview */
+        .matrix-preview {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #34d399;
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        /* RGB Breakdown Guide */
+        .rgb-explanation {
+            margin-top: 1.5rem;
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .rgb-explanation h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .rgb-flow {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+            color: var(--accent);
+        }
+
+        .rgb-legend {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* AI Pipeline Section */
+        .pipeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .pipeline-steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        .pipeline-node {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .pipeline-arrow {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .pipeline-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Scientific Note */
+        .sci-note {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(56, 189, 248, 0.05);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .sci-note strong {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>HOW COMPUTER SEES AN IMAGE</h1>
+        <p>From Image → Pixels → Numbers → NumPy → AI</p>
+    </header>
+
+    <!-- Visual Teaching Flow Bar -->
+    <div class="steps-bar">
+        <div class="step-item"><span>STEP 1</span>Upload Image</div>
+        <div class="step-item"><span>STEP 2</span>Convert to Pixels</div>
+        <div class="step-item"><span>STEP 3</span>Select a Pixel</div>
+        <div class="step-item"><span>STEP 4</span>See RGB Numbers</div>
+        <div class="step-item"><span>STEP 5</span>See NumPy Array</div>
+        <div class="step-item"><span>STEP 6</span>Image Statistics</div>
+        <div class="step-item"><span>STEP 7</span>AI Application</div>
+    </div>
+
+    <!-- Workspace Grid -->
+    <div class="workspace">
+        <!-- Left Column: Image Upload & Visual Grid -->
+        <div class="card">
+            <h2>1. Image & Pixel Grid</h2>
+            <div class="upload-section">
+                <label for="imageUpload" class="btn">Upload Image</label>
+                <input type="file" id="imageUpload" accept="image/*">
+            </div>
+
+            <div class="canvas-container" id="canvasContainer">
+                <span class="placeholder-text" id="placeholderText">Upload an image to see pixel grid transformation</span>
+                <canvas id="imageCanvas" style="display: none;"></canvas>
+            </div>
+
+            <button class="btn btn-secondary" id="convertBtn" style="margin-top: 1rem; display: none;">CONVERT TO PIXELS (GRID VIEW)</button>
+
+            <!-- Clicked Pixel Inspector -->
+            <div id="inspectorPanel" style="display: none; margin-top: 1.5rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--accent);">SELECTED PIXEL INSPECTOR</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Click anywhere on the image/grid above to inspect individual pixel numbers:</p>
+                <div class="inspector-grid">
+                    <div class="metric-box">
+                        <div class="metric-label">Position (X, Y)</div>
+                        <div class="metric-value" id="posValue">X: 0, Y: 0</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">RGB Array</div>
+                        <div class="metric-value" id="rgbValue">[0, 0, 0]</div>
+                    </div>
+                </div>
+
+                <!-- RGB Breakdown Guide -->
+                <div class="rgb-explanation">
+                    <h3>RGB Numerical Breakdown</h3>
+                    <div class="rgb-flow">
+                        <span id="rVal">R: 0</span>
+                        <span id="gVal">G: 0</span>
+                        <span id="bVal">B: 0</span>
+                    </div>
+                    <div class="rgb-legend">
+                        <strong>0</strong> = Absolute Dark &nbsp;|&nbsp; <strong>255</strong> = Maximum Intensity
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: NumPy View & Statistics -->
+        <div class="card">
+            <h2>2. NumPy Representation & Stats</h2>
+            
+            <div class="inspector-grid">
+                <div class="metric-box">
+                    <div class="metric-label">Image Shape (.shape)</div>
+                    <div class="metric-value" id="shapeValue">-- × -- × --</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Total Pixels</div>
+                    <div class="metric-value" id="totalPixels">--</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.25rem;">
+                <div class="metric-label" style="margin-bottom: 0.3rem;">NumPy Array Sample (Matrix Preview)</div>
+                <div class="matrix-preview" id="matrixPreview">
+                    # Load image to view NumPy array format<br>
+                    pixels = np.array(image)<br>
+                    print(pixels[0:3, 0:3])
+                </div>
+            </div>
+
+            <div style="margin-top: 1.25rem;">
+                <div class="metric-label" style="margin-bottom: 0.3rem;">NumPy Statistics Panel</div>
+                <div class="inspector-grid">
+                    <div class="metric-box">
+                        <div class="metric-label">Minimum Value (np.min)</div>
+                        <div class="metric-value" id="minVal">--</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Maximum Value (np.max)</div>
+                        <div class="metric-value" id="maxVal">--</div>
+                    </div>
+                </div>
+                <div class="metric-box" style="margin-top: 0.75rem;">
+                    <div class="metric-label">Average Pixel Value (np.mean)</div>
+                    <div class="metric-value" id="meanVal">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Connection Section -->
+    <div class="pipeline-card">
+        <h2 style="text-align: center; margin-bottom: 0.5rem;">HOW AI USES THIS DATA</h2>
+        <div class="pipeline-steps">
+            <div class="pipeline-node">IMAGE</div>
+            <span class="pipeline-arrow">↓</span>
+            <div class="pipeline-node">PIXELS</div>
+            <span class="pipeline-arrow">↓</span>
+            <div class="pipeline-node">NUMERICAL VALUES</div>
+            <span class="pipeline-arrow">↓</span>
+            <div class="pipeline-node">NUMPY ARRAY</div>
+            <span class="pipeline-arrow">↓</span>
+            <div class="pipeline-node">PREPROCESSING</div>
+            <span class="pipeline-arrow">↓</span>
+            <div class="pipeline-node">AI / COMPUTER VISION</div>
+            <span class="pipeline-arrow">↓</span>
+            <div class="pipeline-node">PREDICTION</div>
+        </div>
+        <p class="pipeline-description">
+            Computers cannot directly understand an image like humans do. Images are represented as numerical pixel data. NumPy helps Python efficiently store and process these numerical arrays before they are used in many AI and computer-vision workflows.
+        </p>
+
+        <div class="sci-note">
+            <strong>Scientific Note:</strong> A computer represents an image using numerical pixel values. At the hardware level these values are ultimately represented in binary, but programmers normally work with pixel values such as 0–255.
+        </div>
+    </div>
+</div>
+
+<script>
+    const imageUpload = document.getElementById('imageUpload');
+    const imageCanvas = document.getElementById('imageCanvas');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const placeholderText = document.getElementById('placeholderText');
+    const convertBtn = document.getElementById('convertBtn');
+    const inspectorPanel = document.getElementById('inspectorPanel');
+
+    const shapeValue = document.getElementById('shapeValue');
+    const totalPixels = document.getElementById('totalPixels');
+    const posValue = document.getElementById('posValue');
+    const rgbValue = document.getElementById('rgbValue');
+    const rVal = document.getElementById('rVal');
+    const gVal = document.getElementById('gVal');
+    const bVal = document.getElementById('bVal');
+    const minVal = document.getElementById('minVal');
+    const maxVal = document.getElementById('maxVal');
+    const meanVal = document.getElementById('meanVal');
+    const matrixPreview = document.getElementById('matrixPreview');
+
+    let ctx = imageCanvas.getContext('2d');
+    let loadedImage = new Image();
+    let imgWidth = 0;
+    let imgHeight = 0;
+    let pixelData = null;
+
+    imageUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            loadedImage.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+    });
+
+    loadedImage.onload = function() {
+        // Resize for performance & clear presentation
+        const maxDim = 256;
+        imgWidth = loadedImage.width;
+        imgHeight = loadedImage.height;
+
+        let w = imgWidth;
+        let h = imgHeight;
+        if (w > maxDim || h > maxDim) {
+            if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+            } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+            }
+        }
+
+        imageCanvas.width = w;
+        imageCanvas.height = h;
+        ctx.drawImage(loadedImage, 0, 0, w, h);
+
+        placeholderText.style.display = 'none';
+        imageCanvas.style.display = 'block';
+        convertBtn.style.display = 'block';
+        inspectorPanel.style.display = 'block';
+
+        // Extract image pixel buffer
+        const imgObj = ctx.getImageData(0, 0, w, h);
+        pixelData = imgObj.data;
+
+        // Compute NumPy-like statistics
+        let sum = 0;
+        let min = 255;
+        let max = 0;
+        let count = w * h;
+
+        for (let i = 0; i < pixelData.length; i += 4) {
+            let r = pixelData[i];
+            let g = pixelData[i+1];
+            let b = pixelData[i+2];
+            let avgChan = (r + g + b) / 3;
+
+            sum += avgChan;
+            if (avgChan < min) min = Math.round(avgChan);
+            if (avgChan > max) max = Math.round(avgChan);
+        }
+
+        let mean = (sum / count).toFixed(1);
+
+        // Update UI Stats
+        shapeValue.innerText = `${h} × ${w} × 3`;
+        totalPixels.innerText = count.toLocaleString();
+        minVal.innerText = min;
+        maxVal.innerText = max;
+        meanVal.innerText = mean;
+
+        // Display sample matrix preview
+        updateMatrixPreview(0, 0, w, h);
+        
+        // Default inspect top-left pixel
+        inspectPixel(10, 10, w);
+    };
+
+    convertBtn.addEventListener('click', function() {
+        // Apply a visual pixel block effect on canvas
+        let w = imageCanvas.width;
+        let h = imageCanvas.height;
+        let blockSize = 8;
+
+        ctx.drawImage(loadedImage, 0, 0, w, h);
+        let imgObj = ctx.getImageData(0, 0, w, h);
+        let data = imgObj.data;
+
+        for (let y = 0; y < h; y += blockSize) {
+            for (let x = 0; x < w; x += blockSize) {
+                let index = (y * w + x) * 4;
+                let r = data[index];
+                let g = data[index+1];
+                let b = data[index+2];
+
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+                ctx.fillRect(x, y, blockSize - 1, blockSize - 1);
+            }
+        }
+    });
+
+    imageCanvas.addEventListener('click', function(e) {
+        let rect = imageCanvas.getBoundingClientRect();
+        let scaleX = imageCanvas.width / rect.width;
+        let scaleY = imageCanvas.height / rect.height;
+
+        let x = Math.floor((e.clientX - rect.left) * scaleX);
+        let y = Math.floor((e.clientY - rect.top) * scaleY);
+
+        if (x >= 0 && x < imageCanvas.width && y >= 0 && y < imageCanvas.height) {
+            inspectPixel(x, y, imageCanvas.width);
+            updateMatrixPreview(x, y, imageCanvas.width, imageCanvas.height);
+        }
+    });
+
+    function inspectPixel(x, y, width) {
+        let index = (y * width + x) * 4;
+        let r = pixelData[index];
+        let g = pixelData[index+1];
+        let b = pixelData[index+2];
+
+        posValue.innerText = `X: ${x}, Y: ${y}`;
+        rgbValue.innerText = `[${r}, ${g}, ${b}]`;
+        rVal.innerText = `R: ${r}`;
+        gVal.innerText = `[${g}]`; // Visual alignment
+        rVal.innerText = `R: ${r}`;
+        gVal.innerText = `G: ${g}`;
+        bVal.innerText = `B: ${b}`;
+    }
+
+    function updateMatrixPreview(x, y, width, height) {
+        let sample = [];
+        for (let dy = 0; dy < 3; dy++) {
+            let row = [];
+            for (let dx = 0; dx < 3; dx++) {
+                let px = Math.min(x + dx, width - 1);
+                let py = Math.min(y + dy, height - 1);
+                let idx = (py * width + px) * 4;
+                row.push(`[${pixelData[idx]}, ${pixelData[idx+1]}, ${pixelData[idx+2]}]`);
+            }
+            sample.push("  [" + row.join(", ") + "]");
+        }
+        matrixPreview.innerHTML = `pixels[${y}:${y+3}, ${x}:${x+3}] = [<br>` + sample.join(",<br>") + `<br>]`;
+    }
+</script>
+
+</body>
+</html>
