@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopKart — See the Data Behind Every Click</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfaff;
+    --surface:#ffffff;
+    --primary:#4b3f8f;
+    --primary-dark:#372f6b;
+    --primary-tint:#efecfb;
+    --accent:#ffb100;
+    --accent-2:#ff6b5b;
+    --text:#211c34;
+    --muted:#6f6885;
+    --line:#e7e3f2;
+
+    --xray-bg:#0a0e13;
+    --xray-panel:#0f151c;
+    --xray-line:#1c2733;
+    --xray-text:#d9f7e8;
+    --xray-muted:#6c8a80;
+    --neon:#3bffa0;
+    --cyan:#3ad4ff;
+
+    --display:'Poppins', sans-serif;
+    --body:'Work Sans', sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--body);
+  }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; }
+
+  /* ============ HEADER ============ */
+  header.top{
+    background:linear-gradient(100deg, var(--primary), var(--primary-dark));
+    color:#fff;
+    padding:14px 22px;
+    display:flex; align-items:center; gap:18px;
+    position:sticky; top:0; z-index:30;
+    box-shadow:0 4px 18px rgba(55,47,107,.18);
+  }
+  .logo{
+    font-family:var(--display); font-weight:800; font-size:21px;
+    letter-spacing:.01em; white-space:nowrap;
+  }
+  .logo span{ color:var(--accent); }
+  .searchbar{
+    flex:1; max-width:560px;
+    display:flex; align-items:center;
+    background:#fff; border-radius:8px;
+    padding:9px 14px;
+    color:var(--text);
+  }
+  .searchbar input{
+    border:none; outline:none; flex:1;
+    font-size:14px; font-family:var(--body); color:var(--text);
+  }
+  .searchbar .ic{ margin-right:8px; opacity:.55; }
+  .cart-pill{
+    margin-left:auto;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:20px;
+    padding:8px 16px;
+    font-size:13.5px; font-weight:600;
+    display:flex; align-items:center; gap:8px;
+    white-space:nowrap;
+  }
+  .cart-pill .count{
+    background:var(--accent); color:#3a2600;
+    border-radius:50%; width:20px; height:20px;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:800;
+  }
+
+  /* ============ TOOLBAR ============ */
+  .toolbar{
+    max-width:1180px; margin:0 auto;
+    padding:16px 22px 4px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+  }
+  .chip{
+    font-size:13px; font-weight:600;
+    padding:8px 15px; border-radius:20px;
+    background:var(--surface); border:1.5px solid var(--line);
+    color:var(--text); cursor:pointer;
+    transition:all .15s;
+  }
+  .chip:hover{ border-color:var(--primary); }
+  .chip.active{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  .chip:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+
+  .toolbar-right{ margin-left:auto; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  select.sortsel{
+    font-size:13px; font-weight:600; color:var(--text);
+    padding:8px 12px; border-radius:20px;
+    border:1.5px solid var(--line); background:var(--surface);
+    cursor:pointer;
+  }
+  .toggle{
+    display:flex; align-items:center; gap:7px;
+    font-size:13px; font-weight:600; color:var(--text);
+    background:var(--surface); border:1.5px solid var(--line);
+    padding:7px 13px; border-radius:20px; cursor:pointer; user-select:none;
+  }
+  .toggle input{ accent-color:var(--primary); width:15px; height:15px; }
+  .toggle.on{ border-color:var(--primary); background:var(--primary-tint); }
+
+  /* ============ LAYOUT ============ */
+  .layout{
+    max-width:1180px; margin:0 auto;
+    padding:10px 22px 80px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+  .section-title{
+    font-family:var(--display); font-weight:700; font-size:16px;
+    margin:18px 0 12px; color:var(--primary-dark);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(190px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    cursor:pointer;
+    transition:transform .18s, box-shadow .18s;
+    animation:pop .3s ease;
+  }
+  @keyframes pop{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  .card:hover{ transform:translateY(-4px); box-shadow:0 14px 30px rgba(75,63,143,.14); }
+  .card:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+  .thumb{
+    height:110px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:42px; margin-bottom:10px;
+  }
+  .card .cat{ font-size:10.5px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.04em; }
+  .card .name{ font-family:var(--display); font-weight:600; font-size:14px; margin:4px 0 6px; line-height:1.3; }
+  .card .meta{ display:flex; justify-content:space-between; align-items:center; }
+  .card .price{ font-weight:800; color:var(--text); font-size:15px; }
+  .card .rating{ font-size:12px; color:var(--muted); font-weight:600; }
+  .card .rating b{ color:#1a8a4a; }
+  .card .addbtn{
+    margin-top:10px; width:100%;
+    background:var(--accent); color:#3a2600;
+    border:none; border-radius:8px;
+    padding:8px; font-weight:700; font-size:12.5px;
+    cursor:pointer;
+  }
+  .addbtn:hover{ filter:brightness(1.05); }
+
+  .empty{
+    grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--muted);
+    font-size:14px;
+  }
+
+  /* ============ MODAL ============ */
+  .overlay{
+    position:fixed; inset:0; background:rgba(20,15,40,.55);
+    display:none; align-items:center; justify-content:center;
+    z-index:80; padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .modal{
+    background:#fff; border-radius:16px; max-width:640px; width:100%;
+    max-height:85vh; overflow-y:auto; padding:26px;
+    animation:pop .25s ease;
+  }
+  .modal .close{
+    float:right; background:var(--primary-tint); border:none;
+    width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:15px; color:var(--primary-dark);
+  }
+  .modal .mthumb{
+    height:150px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:64px; margin:8px 0 16px;
+  }
+  .modal h3{ font-family:var(--display); margin:0 0 6px; font-size:20px; }
+  .modal .mprice{ font-size:22px; font-weight:800; color:var(--primary-dark); margin-bottom:14px; }
+  .modal .addbtn{ width:auto; padding:10px 20px; }
+  .related-title{ font-family:var(--display); font-weight:700; font-size:14px; margin:22px 0 10px; color:var(--primary-dark); }
+  .related-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; }
+  .related-grid .card{ padding:10px; }
+  .related-grid .thumb{ height:70px; font-size:28px; }
+  .related-grid .name{ font-size:12px; }
+
+  /* ============ X-RAY PANEL ============ */
+  .xray-toggle{
+    position:fixed; right:22px; bottom:22px; z-index:70;
+    background:var(--xray-bg); color:var(--neon);
+    border:1px solid var(--neon);
+    border-radius:30px; padding:12px 18px;
+    font-family:var(--mono); font-size:12.5px; font-weight:700;
+    display:flex; align-items:center; gap:8px;
+    cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  .xray-toggle .pulse{
+    width:8px; height:8px; border-radius:50%; background:var(--neon);
+    animation:blip 1.4s infinite;
+  }
+  @keyframes blip{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+  .xray{
+    position:fixed; top:0; right:0; height:100%;
+    width:380px; max-width:92vw;
+    background:var(--xray-bg);
+    border-left:1px solid var(--xray-line);
+    z-index:60;
+    transform:translateX(100%);
+    transition:transform .35s ease;
+    display:flex; flex-direction:column;
+    font-family:var(--mono);
+    color:var(--xray-text);
+  }
+  .xray.open{ transform:translateX(0); }
+
+  .xray-head{
+    padding:18px 18px 14px;
+    border-bottom:1px solid var(--xray-line);
+    position:relative; overflow:hidden;
+  }
+  .xray-head::after{
+    content:""; position:absolute; left:0; right:0; top:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--neon), transparent);
+    animation:scan 2.6s linear infinite;
+  }
+  @keyframes scan{ 0%{ transform:translateX(-100%);} 100%{ transform:translateX(100%);} }
+  .xray-head .title{ font-weight:700; font-size:13px; letter-spacing:.05em; color:var(--neon); }
+  .xray-head .sub{ font-size:11px; color:var(--xray-muted); margin-top:4px; }
+  .xray-head .xclose{
+    position:absolute; top:14px; right:14px;
+    background:none; border:1px solid var(--xray-line); color:var(--xray-text);
+    width:24px; height:24px; border-radius:6px; cursor:pointer; font-size:12px;
+  }
+
+  .xray-body{ padding:16px 18px; overflow-y:auto; flex:1; }
+
+  .concept-tag{
+    display:inline-block;
+    font-size:10.5px; font-weight:700; letter-spacing:.06em;
+    padding:4px 10px; border-radius:5px;
+    margin-bottom:10px;
+  }
+  .concept-tag.filter{ background:#123324; color:var(--neon); border:1px solid var(--neon); }
+  .concept-tag.sort{ background:#0f2733; color:var(--cyan); border:1px solid var(--cyan); }
+  .concept-tag.group{ background:#2a2313; color:#ffcf5c; border:1px solid #ffcf5c; }
+  .concept-tag.agg{ background:#2a1730; color:#e28aff; border:1px solid #e28aff; }
+
+  .explain{
+    font-family:var(--body);
+    font-size:13px; line-height:1.6; color:var(--xray-text);
+    margin-bottom:16px;
+    animation:pop .3s ease;
+  }
+  .explain b{ color:var(--neon); }
+
+  .xtable-wrap{
+    border:1px solid var(--xray-line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  table.xtable{ width:100%; border-collapse:collapse; font-size:11px; }
+  table.xtable th{
+    text-align:left; padding:7px 8px;
+    background:var(--xray-panel);
+    color:var(--xray-muted); font-weight:600;
+    border-bottom:1px solid var(--xray-line);
+    position:sticky; top:0;
+  }
+  table.xtable td{
+    padding:6px 8px; border-bottom:1px solid #141c24;
+    color:var(--xray-text);
+  }
+  table.xtable tr:last-child td{ border-bottom:none; }
+  table.xtable tbody tr{ animation:rowin .3s ease; }
+  @keyframes rowin{ from{opacity:0;} to{opacity:1;} }
+  .xray-foot{
+    font-size:10.5px; color:var(--xray-muted); padding:10px 18px 16px; border-top:1px solid var(--xray-line);
+  }
+
+  /* ============ NEW: intro banner ============ */
+  .banner{
+    max-width:1180px; margin:14px auto 0; padding:0 22px;
+  }
+  .banner-inner{
+    background:var(--primary-tint);
+    border:1.5px dashed var(--primary);
+    border-radius:12px;
+    padding:12px 16px;
+    font-size:13px; color:var(--primary-dark); font-weight:600;
+    display:flex; align-items:center; gap:10px;
+  }
+  .banner-inner span.arrow{ font-size:16px; animation:nudge 1.2s infinite; }
+  @keyframes nudge{ 0%,100%{ transform:translateX(0);} 50%{ transform:translateX(4px);} }
+  .banner-inner .bx{
+    margin-left:auto; background:none; border:none; cursor:pointer;
+    font-size:15px; color:var(--primary-dark); opacity:.6;
+  }
+  .banner.hide{ display:none; }
+
+  /* ============ NEW: concept counters ============ */
+  .counters{
+    display:flex; gap:8px; padding:12px 18px 4px; flex-wrap:wrap;
+  }
+  .counter{
+    font-family:var(--mono); font-size:10px; font-weight:700;
+    padding:4px 9px; border-radius:5px;
+    display:flex; align-items:center; gap:5px;
+    color:var(--xray-muted); border:1px solid var(--xray-line);
+  }
+  .counter b{ color:var(--xray-text); font-size:11px; }
+  .counter.filter{ border-color:#123324; } .counter.filter b{ color:var(--neon); }
+  .counter.sort{ border-color:#0f2733; } .counter.sort b{ color:var(--cyan); }
+  .counter.group{ border-color:#2a2313; } .counter.group b{ color:#ffcf5c; }
+  .counter.agg{ border-color:#2a1730; } .counter.agg b{ color:#e28aff; }
+
+  /* ============ NEW: before/after ============ */
+  .ba-toggle{
+    display:flex; align-items:center; gap:7px;
+    font-family:var(--body); font-size:12px; font-weight:600;
+    color:var(--xray-text); margin-bottom:10px; cursor:pointer; user-select:none;
+  }
+  .ba-toggle input{ accent-color:var(--neon); }
+  .ba-label{
+    font-family:var(--mono); font-size:10px; color:var(--xray-muted);
+    margin-bottom:6px;
+  }
+  table.xtable td.dim{ opacity:.25; }
+  table.xtable td.notrated{ color:var(--accent-2); font-style:italic; }
+  .card .rating .notrated{ color:#b48; font-style:italic; }
+
+  .combo-note{
+    margin-top:10px; padding:9px 11px;
+    background:#12222f; border:1px solid var(--cyan); border-radius:6px;
+    font-family:var(--body); font-size:12px; color:var(--cyan); line-height:1.5;
+  }
+
+  @media (max-width:720px){
+    .searchbar{ display:none; }
+    header.top{ gap:10px; }
+    .xray{ width:100%; }
+    .banner-inner{ font-size:12px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="logo">Shop<span>Kart</span></div>
+  <div class="searchbar">
+    <span class="ic">🔍</span>
+    <input id="searchInput" type="text" placeholder="Search for shoes, mobiles, kurtas...">
+  </div>
+  <div class="cart-pill">🛒 Cart <span class="count" id="cartCount">0</span> · ₹<span id="cartTotal">0</span></div>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <button class="chip active" data-cat="All">All</button>
+  <button class="chip" data-cat="Mobiles">Mobiles</button>
+  <button class="chip" data-cat="Electronics">Electronics</button>
+  <button class="chip" data-cat="Fashion">Fashion</button>
+  <button class="chip" data-cat="Footwear">Footwear</button>
+  <button class="chip" data-cat="Home">Home</button>
+
+  <div class="toolbar-right">
+    <label class="toggle" id="ratingToggleWrap">
+      <input type="checkbox" id="ratingToggle"> 4★ &amp; above
+    </label>
+    <label class="toggle" id="groupToggleWrap">
+      <input type="checkbox" id="groupToggle"> Group by Brand
+    </label>
+    <select class="sortsel" id="sortSel">
+      <option value="popularity">Sort: Popularity</option>
+      <option value="price_asc">Price: Low to High</option>
+      <option value="price_desc">Price: High to Low</option>
+      <option value="rating">Sort: Rating</option>
+    </select>
+  </div>
+</div>
+
+<div class="banner" id="banner">
+  <div class="banner-inner">
+    <span class="arrow">👉</span>
+    New here? Click a category chip, search a product, or turn on a filter — watch the X-Ray panel light up on the right.
+    <button class="bx" id="bannerClose">✕</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div id="sectionTitle" class="section-title">All products</div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- product modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<!-- x-ray toggle -->
+<button class="xray-toggle" id="xrayToggle"><span class="pulse"></span> X-RAY: see the data</button>
+
+<!-- x-ray panel -->
+<aside class="xray" id="xray">
+  <div class="xray-head">
+    <div class="title">🐼 DATA X-RAY</div>
+    <div class="sub">what's happening behind your last click</div>
+    <button class="xclose" id="xrayClose">✕</button>
+  </div>
+  <div class="counters">
+    <div class="counter filter">FILTER <b id="cnt-filter">0</b></div>
+    <div class="counter sort">SORT <b id="cnt-sort">0</b></div>
+    <div class="counter group">GROUP <b id="cnt-group">0</b></div>
+    <div class="counter agg">AGG <b id="cnt-agg">0</b></div>
+  </div>
+  <div class="xray-body">
+    <span class="concept-tag filter" id="conceptTag">FILTERING</span>
+    <div class="explain" id="explainText">Browse the store on the left — every click here updates this panel.</div>
+
+    <label class="ba-toggle" id="baToggleWrap">
+      <input type="checkbox" id="baToggle" checked>
+      Show Before → After (all 12 rows, matches highlighted)
+    </label>
+    <div class="ba-label" id="baLabel"></div>
+    <div class="xtable-wrap">
+      <table class="xtable" id="xtable"></table>
+    </div>
+  </div>
+  <div class="xray-foot">This mirrors the real DataFrame a ShopKart engineer would be looking at — filtered, sorted, or grouped exactly the way pandas does it.</div>
+</aside>
+
+<script>
+/* ================= PRODUCT DATA ================= */
+const PRODUCTS = [
+  { id:1,  name:"Wireless Earbuds X200",  cat:"Electronics", brand:"SonicWave", price:1499,  rating:4.3, sales:320, icon:"🎧", color:"#eef0ff" },
+  { id:2,  name:"Smartphone Pulse 5G",    cat:"Mobiles",     brand:"Nexbyte",   price:15999, rating:4.5, sales:540, icon:"📱", color:"#fff3e0" },
+  { id:3,  name:"Running Shoes Air Max",  cat:"Footwear",    brand:"Stridex",   price:2199,  rating:4.1, sales:210, icon:"👟", color:"#e8f7ee" },
+  { id:4,  name:"Cotton Kurta Set",       cat:"Fashion",     brand:"Vastra",    price:899,   rating:4.6, sales:150, icon:"👗", color:"#fdeef2" },
+  { id:5,  name:"Mixer Grinder 750W",     cat:"Home",        brand:"Homely",    price:2599,  rating:4.0, sales:95,  icon:"🧉", color:"#f2eefe" },
+  { id:6,  name:"Bluetooth Speaker Boom", cat:"Electronics", brand:"SonicWave", price:1899,  rating:3.8, sales:180, icon:"🔊", color:"#eef0ff" },
+  { id:7,  name:"Smartwatch Fit Pro",     cat:"Mobiles",     brand:"Nexbyte",   price:3499,  rating:4.4, sales:410, icon:"⌚", color:"#fff3e0" },
+  { id:8,  name:"Formal Shirt Slimfit",   cat:"Fashion",     brand:"Vastra",    price:799,   rating:4.2, sales:260, icon:"👔", color:"#fdeef2" },
+  { id:9,  name:"Non-stick Pan Set",      cat:"Home",        brand:"Homely",    price:1299,  rating:null, sales:140, icon:"🍳", color:"#f2eefe" },
+  { id:10, name:"Sports Sandals Flex",    cat:"Footwear",    brand:"Stridex",   price:999,   rating:3.9, sales:90,  icon:"🩴", color:"#e8f7ee" },
+  { id:11, name:"Laptop Stand Pro",       cat:"Electronics", brand:"SonicWave", price:699,   rating:4.7, sales:300, icon:"💻", color:"#eef0ff" },
+  { id:12, name:"Denim Jacket Classic",   cat:"Fashion",     brand:"Vastra",    price:1599,  rating:4.5, sales:220, icon:"🧥", color:"#fdeef2" },
+];
+
+const state = { search:"", cat:"All", rating4:false, groupBrand:false, sort:"popularity" };
+const cart = [];
+
+/* ================= CORE FILTER/SORT ================= */
+function getFiltered(){
+  let list = PRODUCTS.filter(p=>{
+    const matchSearch = state.search === "" ||
+      p.name.toLowerCase().includes(state.search) ||
+      p.cat.toLowerCase().includes(state.search) ||
+      p.brand.toLowerCase().includes(state.search);
+    const matchCat = state.cat === "All" || p.cat === state.cat;
+    const matchRating = !state.rating4 || p.rating >= 4;
+    return matchSearch && matchCat && matchRating;
+  });
+  const sorters = {
+    popularity: (a,b)=>b.sales-a.sales,
+    price_asc:  (a,b)=>a.price-b.price,
+    price_desc: (a,b)=>b.price-a.price,
+    rating:     (a,b)=>(b.rating??-1)-(a.rating??-1),
+  };
+  list = list.slice().sort(sorters[state.sort]);
+  return list;
+}
+
+/* ================= RENDER SHOP GRID ================= */
+function renderGrid(){
+  const list = getFiltered();
+  const grid = document.getElementById('grid');
+  document.getElementById('sectionTitle').textContent =
+    state.cat === "All" ? "All products" : state.cat;
+
+  if(list.length === 0){
+    grid.innerHTML = `<div class="empty">No products match these filters — try clearing search or the rating filter.</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p=>`
+    <div class="card" data-id="${p.id}" tabindex="0">
+      <div class="thumb" style="background:${p.color}">${p.icon}</div>
+      <div class="cat">${p.cat}</div>
+      <div class="name">${p.name}</div>
+      <div class="meta">
+        <span class="price">₹${p.price.toLocaleString('en-IN')}</span>
+        <span class="rating">${p.rating===null ? '<span class="notrated">Not Rated</span>' : `<b>${p.rating}★</b>`}</span>
+      </div>
+      <button class="addbtn" data-add="${p.id}">Add to Cart</button>
+    </div>
+  `).join('');
+}
+
+/* ================= X-RAY PANEL ================= */
+const counters = { filter:0, sort:0, group:0, agg:0 };
+function bumpCounter(conceptClass){
+  const key = conceptClass.split(' ')[0]; // 'filter' | 'sort' | 'group' | 'agg'
+  if(counters[key] === undefined) return;
+  counters[key]++;
+  const el = document.getElementById('cnt-'+key);
+  if(el) el.textContent = counters[key];
+}
+
+function activeFilterCount(){
+  let n = 0;
+  if(state.search !== "") n++;
+  if(state.cat !== "All") n++;
+  if(state.rating4) n++;
+  return n;
+}
+
+function setXray(conceptClass, conceptLabel, explainHtml, opts={}){
+  document.getElementById('conceptTag').className = "concept-tag " + conceptClass;
+  document.getElementById('conceptTag').textContent = conceptLabel;
+
+  let html = explainHtml;
+  if(opts.isFilterAction && activeFilterCount() >= 2){
+    html += `<div class="combo-note">🔗 ${activeFilterCount()} conditions are active together right now (search / category / rating). Stacking conditions like this is called <b>combined filtering</b> — real analysts do this constantly to go from millions of rows to just the handful that matter.</div>`;
+  }
+  document.getElementById('explainText').innerHTML = html;
+  bumpCounter(conceptClass);
+}
+
+function ratingCellHtml(p, dim){
+  const dimCls = dim ? ' dim' : '';
+  if(p.rating === null) return `<td class="notrated${dimCls}">— missing</td>`;
+  return `<td class="${dimCls}">${p.rating}★</td>`;
+}
+
+function renderXtable(){
+  const tableEl = document.getElementById('xtable');
+  const baToggle = document.getElementById('baToggle');
+  const baWrap = document.getElementById('baToggleWrap');
+  const baLabel = document.getElementById('baLabel');
+
+  if(state.groupBrand){
+    baWrap.style.display = 'none';
+    baLabel.textContent = '';
+    const brands = [...new Set(PRODUCTS.map(p=>p.brand))];
+    const rows = brands.map(b=>{
+      const items = PRODUCTS.filter(p=>p.brand===b);
+      const rated = items.filter(p=>p.rating!==null);
+      const avgPrice = Math.round(items.reduce((s,p)=>s+p.price,0)/items.length);
+      const avgRating = rated.length ? (rated.reduce((s,p)=>s+p.rating,0)/rated.length).toFixed(2) : '—';
+      return `<tr><td><b>${b}</b></td><td>${items.length}</td><td>₹${avgPrice.toLocaleString('en-IN')}</td><td>${avgRating}${avgRating!=='—'?'★':''}</td></tr>`;
+    }).join('');
+    tableEl.innerHTML = `<thead><tr><th>Brand</th><th>Products</th><th>Avg Price</th><th>Avg Rating</th></tr></thead><tbody>${rows}</tbody>`;
+    return;
+  }
+
+  baWrap.style.display = 'flex';
+  const filtered = getFiltered();
+  const matchIds = new Set(filtered.map(p=>p.id));
+
+  if(baToggle.checked){
+    // BEFORE -> AFTER: show all 12 rows, sorted, non-matches dimmed
+    const sorters = {
+      popularity: (a,b)=>b.sales-a.sales,
+      price_asc:  (a,b)=>a.price-b.price,
+      price_desc: (a,b)=>b.price-a.price,
+      rating:     (a,b)=>(b.rating??-1)-(a.rating??-1),
+    };
+    const all = PRODUCTS.slice().sort(sorters[state.sort]);
+    baLabel.textContent = `12 total rows → ${filtered.length} row${filtered.length===1?'':'s'} match your filters (highlighted)`;
+    const rows = all.map(p=>{
+      const dim = !matchIds.has(p.id);
+      return `<tr>
+        <td class="${dim?'dim':''}">${p.name}</td>
+        <td class="${dim?'dim':''}">${p.cat}</td>
+        <td class="${dim?'dim':''}">₹${p.price.toLocaleString('en-IN')}</td>
+        ${ratingCellHtml(p, dim)}
+      </tr>`;
+    }).join('');
+    tableEl.innerHTML = `<thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Rating</th></tr></thead><tbody>${rows}</tbody>`;
+  } else {
+    // AFTER only
+    baLabel.textContent = `Showing only the ${filtered.length} matching row${filtered.length===1?'':'s'}`;
+    const rows = filtered.slice(0,10).map(p=>`
+      <tr><td>${p.name}</td><td>${p.cat}</td><td>₹${p.price.toLocaleString('en-IN')}</td>${ratingCellHtml(p,false)}</tr>
+    `).join('') || `<tr><td colspan="4" style="color:var(--xray-muted)">No matching rows</td></tr>`;
+    tableEl.innerHTML = `<thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Rating</th></tr></thead><tbody>${rows}</tbody>`;
+  }
+}
+
+function renderCart(){
+  document.getElementById('cartCount').textContent = cart.length;
+  const total = cart.reduce((s,p)=>s+p.price,0);
+  document.getElementById('cartTotal').textContent = total.toLocaleString('en-IN');
+}
+
+function refreshAll(){
+  renderGrid();
+  renderXtable();
+  renderCart();
+}
+
+/* ================= EVENTS ================= */
+document.getElementById('searchInput').addEventListener('input', e=>{
+  state.search = e.target.value.trim().toLowerCase();
+  refreshAll();
+  if(state.search){
+    setXray('filter','FILTERING', `You typed <b>"${e.target.value}"</b>. Pandas scanned the Name, Category and Brand columns and kept only the rows that matched — every other row just got dropped from view. This is called filtering.`, {isFilterAction:true});
+  } else {
+    setXray('filter','FILTERING', `Search cleared — pandas is showing every row again.`, {isFilterAction:true});
+  }
+});
+
+document.getElementById('toolbar').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  state.cat = chip.dataset.cat;
+  refreshAll();
+  setXray('filter','FILTERING',
+    state.cat === "All"
+      ? `You cleared the category filter. Pandas is showing every row again — no condition applied.`
+      : `You selected <b>"${state.cat}"</b>. Pandas kept only the rows where the Category column equals "${state.cat}" and hid the rest. This is the same idea as filtering one column in a spreadsheet.`,
+    {isFilterAction:true}
+  );
+});
+
+document.getElementById('ratingToggle').addEventListener('change', e=>{
+  state.rating4 = e.target.checked;
+  document.getElementById('ratingToggleWrap').classList.toggle('on', state.rating4);
+  refreshAll();
+  setXray('filter','FILTERING',
+    state.rating4
+      ? `You turned on <b>"4★ & above"</b>. Pandas kept only rows where the Rating column is 4 or higher. Notice "Non-stick Pan Set" also disappeared — it has a <b>missing</b> rating, and pandas can't compare a blank value to 4, so it gets excluded automatically. In a real project this is exactly why you'd use <b>fillna()</b> before filtering, so good products don't vanish just because one field was left empty.`
+      : `Rating filter cleared — products below 4★ (and the one with a missing rating) are back in view.`,
+    {isFilterAction:true}
+  );
+});
+
+document.getElementById('groupToggle').addEventListener('change', e=>{
+  state.groupBrand = e.target.checked;
+  document.getElementById('groupToggleWrap').classList.toggle('on', state.groupBrand);
+  renderXtable();
+  setXray('group','GROUPING + AGGREGATING',
+    state.groupBrand
+      ? `You turned on <b>"Group by Brand"</b>. Pandas collected every product into its brand's group, then calculated the count, average price and average rating for each group — one summary row per brand instead of 12 separate rows.`
+      : `Grouping turned off — back to seeing individual products, not brand summaries.`
+  );
+});
+
+document.getElementById('sortSel').addEventListener('change', e=>{
+  state.sort = e.target.value;
+  refreshAll();
+  const labels = {
+    popularity: "Popularity — most sold first",
+    price_asc: "Price: Low to High",
+    price_desc: "Price: High to Low",
+    rating: "Rating — highest first",
+  };
+  setXray('sort','SORTING',
+    `You chose <b>"${labels[state.sort]}"</b>. Pandas reordered every row by that column — nothing was added or removed, just re-arranged. This is exactly what sorting a column does in real life.`
+  );
+});
+
+document.getElementById('grid').addEventListener('click', e=>{
+  const addBtn = e.target.closest('[data-add]');
+  if(addBtn){
+    e.stopPropagation();
+    const p = PRODUCTS.find(x=>x.id === Number(addBtn.dataset.add));
+    cart.push(p);
+    renderCart();
+    renderXtable();
+    const total = cart.reduce((s,x)=>s+x.price,0);
+    setXray('agg','AGGREGATING (SUM)',
+      `You added <b>"${p.name}"</b> to the cart. Pandas is adding up the Price column for everything in your cart: ${cart.length} item${cart.length>1?'s':''} = <b>₹${total.toLocaleString('en-IN')}</b> total. Every "cart total" you've ever seen online is this same sum happening behind the scenes.`
+    );
+    return;
+  }
+  const card = e.target.closest('.card');
+  if(card) openModal(Number(card.dataset.id));
+});
+
+document.getElementById('grid').addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){
+    const card = e.target.closest('.card');
+    if(card) openModal(Number(card.dataset.id));
+  }
+});
+
+/* ================= MODAL ================= */
+function openModal(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  const related = PRODUCTS.filter(x=>x.cat===p.cat && x.id!==p.id).slice(0,4);
+  document.getElementById('modalBody').innerHTML = `
+    <button class="close" id="modalClose">✕</button>
+    <div class="mthumb" style="background:${p.color}">${p.icon}</div>
+    <div class="cat">${p.cat} · ${p.brand}</div>
+    <h3>${p.name}</h3>
+    <div class="mprice">₹${p.price.toLocaleString('en-IN')} &nbsp; <span style="font-size:13px;color:var(--muted);font-weight:500">${p.rating===null?'Not Rated yet':p.rating+'★'} · ${p.sales} sold</span></div>
+    <button class="addbtn" data-add="${p.id}">Add to Cart</button>
+    <div class="related-title">You may also like</div>
+    <div class="related-grid">
+      ${related.map(r=>`
+        <div class="card" data-id="${r.id}">
+          <div class="thumb" style="background:${r.color}">${r.icon}</div>
+          <div class="name">${r.name}</div>
+          <div class="price" style="font-size:12px">₹${r.price.toLocaleString('en-IN')}</div>
+        </div>`).join('')}
+    </div>
+  `;
+  document.getElementById('overlay').classList.add('show');
+  setXray('filter','FILTERING',
+    `You opened <b>"${p.name}"</b>. To build "You may also like", pandas filtered for every other row where Category equals "${p.cat}" — the same filtering trick as the category chips, just running automatically for you.`
+  );
+}
+document.getElementById('overlay').addEventListener('click', e=>{
+  if(e.target.id === 'overlay' || e.target.id === 'modalClose'){
+    document.getElementById('overlay').classList.remove('show');
+  }
+  const addBtn = e.target.closest('[data-add]');
+  if(addBtn){
+    const p = PRODUCTS.find(x=>x.id === Number(addBtn.dataset.add));
+    cart.push(p);
+    renderCart();
+    renderXtable();
+    const total = cart.reduce((s,x)=>s+x.price,0);
+    setXray('agg','AGGREGATING (SUM)',
+      `You added <b>"${p.name}"</b> to the cart. Pandas is adding up the Price column for everything in your cart: ${cart.length} item${cart.length>1?'s':''} = <b>₹${total.toLocaleString('en-IN')}</b> total.`
+    );
+  }
+  const relCard = e.target.closest('.related-grid .card');
+  if(relCard){
+    document.getElementById('overlay').classList.remove('show');
+    openModal(Number(relCard.dataset.id));
+  }
+});
+
+document.getElementById('baToggle').addEventListener('change', renderXtable);
+
+/* ================= BANNER ================= */
+document.getElementById('bannerClose').addEventListener('click', ()=>{
+  document.getElementById('banner').classList.add('hide');
+});
+function dismissBannerOnce(){
+  document.getElementById('banner').classList.add('hide');
+}
+
+/* ================= X-RAY TOGGLE (with mobile "peek" label) ================= */
+const xray = document.getElementById('xray');
+const xrayToggleBtn = document.getElementById('xrayToggle');
+const xrayToggleDefaultText = xrayToggleBtn.innerHTML;
+
+document.getElementById('xrayToggle').addEventListener('click', ()=>{
+  xray.classList.add('open');
+  xrayToggleBtn.innerHTML = xrayToggleDefaultText;
+});
+document.getElementById('xrayClose').addEventListener('click', ()=> xray.classList.remove('open'));
+
+// keep the floating button's label in sync with the latest concept when the panel is closed (mobile peek)
+const _origSetXray = setXray;
+setXray = function(conceptClass, conceptLabel, explainHtml, opts){
+  _origSetXray(conceptClass, conceptLabel, explainHtml, opts);
+  dismissBannerOnce();
+  if(!xray.classList.contains('open')){
+    xrayToggleBtn.innerHTML = `<span class="pulse"></span> ${conceptLabel} active — tap to see`;
+  }
+};
+
+/* ================= INIT ================= */
+refreshAll();
+if(window.innerWidth > 900) xray.classList.add('open');
+</script>
+</body>
+</html>
