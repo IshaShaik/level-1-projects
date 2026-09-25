@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Train — Yoga Pose Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="train">
+
+<header class="lab-header">
+  <div id="header-root"></div>
+</header>
+
+<main class="shell">
+  <section class="hero">
+    <h2 id="project-name">Loading project…</h2>
+    <p class="lede">
+      Add a pose class for every position you want the AI to recognize, capture samples with your webcam,
+      then train a classifier from the collected landmarks.
+    </p>
+  </section>
+
+  <div class="section-title">
+    <h3>Your Trained Poses</h3>
+    <span>First three are featured automatically</span>
+  </div>
+  <div class="featured-row" id="featured-row"></div>
+
+  <div class="train-layout">
+    <div>
+      <section class="training-poses-panel">
+        <div class="training-poses-panel-head">
+          <h3>Your Training Poses</h3>
+          <span>Match the reference image, then capture — no typing needed</span>
+        </div>
+        <div class="pose-grid" id="pose-grid">
+          <div class="add-pose-card" id="add-pose-card">+ ADD CUSTOM POSE</div>
+        </div>
+      </section>
+
+      <div class="edu-note" style="margin-top: 22px;">
+        <strong>Why one shared camera?</strong> Every pose card captures from the same live feed on the right —
+        just look at the reference image, match the pose, and hit "Capture" — it lands straight in that pose's gallery.
+      </div>
+
+      <div class="glass" style="padding: 24px; margin-top: 22px;">
+        <h3 style="font-family: var(--font-display); font-size: 16px; margin: 0 0 6px;">Train Model</h3>
+        <p style="font-size: 12.5px; color: var(--text-mid); margin: 0 0 16px;">
+          Needs at least 2 pose classes with 8+ samples each. More samples generally means better accuracy.
+        </p>
+        <button class="btn btn-primary btn-lg btn-block" id="btn-train-model">TRAIN MODEL</button>
+        <p id="train-message" style="font-size: 12.5px; color: var(--amber); margin: 12px 0 0;"></p>
+      </div>
+
+      <div class="glass training-panel hidden" id="training-panel" style="margin-top: 18px;">
+        <h3 style="font-family: var(--font-display); font-size: 15px; margin:0;">AI MODEL TRAINING</h3>
+        <div class="training-log" id="training-log"></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="metric-row">
+          <div class="metric"><div class="label" id="epoch-label">Epoch 0 / 50</div></div>
+          <div class="metric"><div class="label">Accuracy</div><div class="value mint" id="metric-acc">—</div></div>
+          <div class="metric"><div class="label">Loss</div><div class="value cyan" id="metric-loss">—</div></div>
+        </div>
+      </div>
+
+      <div class="result-banner hidden" id="result-banner" style="margin-top: 18px;"></div>
+
+      <div class="edu-note" style="margin-top: 22px;">
+        <strong>What is a sample?</strong> One example of a pose that the AI uses during training — a snapshot of your body's landmark positions, not the video frame itself.
+      </div>
+      <div class="edu-note">
+        <strong>What is a class?</strong> The name/category assigned to a pose, like "Tree Pose" or "Warrior Pose".
+      </div>
+      <div class="edu-note">
+        <strong>Why MediaPipe?</strong> It detects shoulders, elbows, wrists, hips, knees and ankles, so the model learns from body structure instead of raw pixels — much easier to understand and far less data-hungry.
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="camera-frame" id="camera-frame">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="camera-canvas"></canvas>
+        <div class="camera-overlay-ui">
+          <div class="detect-pill" id="detect-pill"><span class="pulse"></span>POSE DETECTION ACTIVE</div>
+          <div class="quality-stack" id="quality-stack"></div>
+        </div>
+        <div class="capture-flash" id="capture-flash"></div>
+        <div class="camera-placeholder" id="camera-placeholder">
+          <p>Allow camera access to start training.</p>
+          <button class="btn btn-primary" id="btn-start-camera">ENABLE CAMERA</button>
+        </div>
+      </div>
+      <div class="camera-controls">
+        <select id="camera-select"></select>
+      </div>
+    </div>
+  </div>
+
+  <footer class="privacy-note">
+    <strong>Camera processing happens locally in your browser.</strong> Only landmark coordinates and small thumbnails are saved to your project.
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

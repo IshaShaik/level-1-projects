@@ -1,0 +1,13 @@
+{
+  "name": "yoga-pose-trainer",
+  "version": "1.0.0",
+  "description": "AI-powered yoga pose training lab using MediaPipe landmarks and TensorFlow.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}

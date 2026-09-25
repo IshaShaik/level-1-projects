@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yoga Pose Trainer — AI Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="index">
+
+<header class="lab-header">
+  <div id="header-root"></div>
+</header>
+
+<main class="shell">
+  <section class="hero">
+    <h2>Your Personal AI Yoga Training Laboratory</h2>
+    <p class="lede">
+      Teach a neural network to recognize yoga poses using nothing but your webcam.
+      Create a project, capture a few samples of each pose, and train a real
+      TensorFlow.js classifier — all running locally in your browser.
+    </p>
+  </section>
+
+  <div class="glass glass-glow" style="padding: 22px; display:flex; align-items:center; justify-content:space-between; gap: 16px; flex-wrap: wrap;">
+    <div>
+      <h3 style="margin:0 0 4px; font-family: var(--font-display); font-size: 16px;">Your Projects</h3>
+      <p style="margin:0; font-size: 12.5px; color: var(--text-mid);">Open an existing project or start a new one.</p>
+    </div>
+    <button class="btn btn-primary btn-lg" id="btn-new-project">+ NEW PROJECT</button>
+  </div>
+
+  <div id="project-list" style="display:flex; flex-direction:column; gap:12px; margin-top: 20px;"></div>
+  <div id="project-empty" class="empty-state glass" style="margin-top: 20px;">
+    No projects yet. Create one to start training your first pose.
+  </div>
+
+  <div class="section-title"><h3>How the workflow fits together</h3></div>
+  <div class="glass" style="padding: 22px;">
+    <div class="path-steps">
+      <div class="path-step"><div class="n">1</div>Create a project, then add a pose class for each pose you want to teach it.</div>
+      <div class="path-step"><div class="n">2</div>Open your camera and capture samples while you hold each pose — MediaPipe reads your body landmarks in real time.</div>
+      <div class="path-step"><div class="n">3</div>Once every pose has enough samples, train a small neural network right in the browser.</div>
+      <div class="path-step"><div class="n">4</div>Test it live: strike a pose and watch the confidence bars respond.</div>
+      <div class="path-step"><div class="n">5</div>Explore your model, export it, or export the raw training data to keep learning in Python.</div>
+    </div>
+  </div>
+
+  <footer class="privacy-note">
+    <strong>Camera processing happens locally in your browser.</strong> Video is never uploaded — only landmark coordinates and small thumbnails are saved to your project.
+  </footer>
+</main>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

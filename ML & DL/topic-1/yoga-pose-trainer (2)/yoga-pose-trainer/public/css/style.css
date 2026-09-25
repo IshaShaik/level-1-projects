@@ -1,0 +1,1072 @@
+/* =========================================================
+   YOGA POSE TRAINER — design tokens
+   Palette: deep space-blue lab background, cyan/violet signal
+   accents borrowed from motion-capture visualisations, warm
+   coral reserved for destructive actions only.
+   Type: Space Grotesk (display) + Inter (body/UI)
+   ========================================================= */
+
+:root {
+  --void:        #05070d;
+  --void-2:      #090d18;
+  --panel:       rgba(19, 26, 45, 0.55);
+  --panel-solid: #101526;
+  --panel-border: rgba(125, 168, 255, 0.16);
+  --hairline:    rgba(255, 255, 255, 0.07);
+
+  --cyan:        #4dd9ff;
+  --cyan-dim:    rgba(77, 217, 255, 0.35);
+  --violet:      #9b7bff;
+  --violet-dim:  rgba(155, 123, 255, 0.35);
+  --coral:       #ff5f7e;
+  --amber:       #ffb14d;
+  --mint:        #37e6a0;
+
+  --text-hi:     #eef3ff;
+  --text-mid:    #aab6d6;
+  --text-dim:    #6d7797;
+
+  --radius-lg:   20px;
+  --radius-md:   14px;
+  --radius-sm:   9px;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --ease: cubic-bezier(.22, .9, .3, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--void);
+  color: var(--text-hi);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+body {
+  background-image:
+    radial-gradient(1100px 600px at 12% -10%, rgba(77, 217, 255, 0.10), transparent 60%),
+    radial-gradient(900px 700px at 100% 10%, rgba(155, 123, 255, 0.10), transparent 55%),
+    linear-gradient(180deg, var(--void) 0%, var(--void-2) 100%);
+  background-attachment: fixed;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+
+::selection { background: var(--violet-dim); }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(125,168,255,0.25); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(125,168,255,0.4); }
+
+/* =========================================================
+   Layout shell
+   ========================================================= */
+
+.shell {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px 64px;
+}
+
+/* =========================================================
+   Header
+   ========================================================= */
+
+.lab-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgba(5, 7, 13, 0.72);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.lab-header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: conic-gradient(from 200deg, var(--cyan), var(--violet), var(--cyan));
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 0 22px rgba(77, 217, 255, 0.35);
+}
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 8px;
+  background: var(--void);
+}
+.brand-mark::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--violet));
+}
+
+.brand-text h1 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  margin: 0;
+  line-height: 1.1;
+}
+.brand-text p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.lab-nav {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 4px;
+}
+
+.lab-nav a {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mid);
+  transition: color .2s var(--ease), background .2s var(--ease);
+}
+.lab-nav a:hover { color: var(--text-hi); }
+.lab-nav a.active {
+  color: var(--void);
+  background: linear-gradient(120deg, var(--cyan), var(--violet));
+}
+
+.status-strip {
+  display: flex;
+  gap: 18px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.status-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+.status-chip .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  box-shadow: none;
+}
+.status-chip .dot.on { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+.status-chip .dot.warn { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+.status-chip .dot.off { background: var(--coral); box-shadow: 0 0 8px var(--coral); }
+.status-chip strong { color: var(--text-hi); font-weight: 700; }
+
+/* =========================================================
+   Cards / glass panel primitive
+   ========================================================= */
+
+.glass {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+}
+
+.glass-glow {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 30px 60px -30px rgba(0,0,0,0.7);
+}
+
+/* =========================================================
+   Hero / project bar
+   ========================================================= */
+
+.hero {
+  padding: 48px 0 28px;
+}
+.hero h2 {
+  font-family: var(--font-display);
+  font-size: 34px;
+  margin: 0 0 8px;
+  letter-spacing: 0.2px;
+}
+.hero p.lede {
+  color: var(--text-mid);
+  max-width: 60ch;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.project-bar {
+  margin-top: 24px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.project-bar .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.project-bar label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.project-bar select, .project-bar input[type=text] {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--hairline);
+  color: var(--text-hi);
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  min-width: 220px;
+}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--hairline);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-hi);
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+}
+.btn:hover { border-color: var(--cyan-dim); background: rgba(77,217,255,0.07); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary {
+  border: none;
+  color: #04101a;
+  background: linear-gradient(120deg, var(--cyan), var(--violet));
+  box-shadow: 0 8px 30px -10px rgba(77,217,255,0.5);
+}
+.btn-primary:hover { filter: brightness(1.08); background: linear-gradient(120deg, var(--cyan), var(--violet)); }
+
+.btn-danger { color: var(--coral); border-color: rgba(255,95,126,0.3); }
+.btn-danger:hover { background: rgba(255,95,126,0.08); }
+
+.btn-block { width: 100%; }
+.btn-lg { padding: 16px 26px; font-size: 15px; }
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--hairline);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-mid);
+  cursor: pointer;
+}
+.icon-btn:hover { color: var(--text-hi); border-color: var(--cyan-dim); }
+
+/* =========================================================
+   Featured poses
+   ========================================================= */
+
+.section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 40px 0 16px;
+}
+.section-title h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+.section-title span { color: var(--text-dim); font-size: 12.5px; }
+
+.featured-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 980px) { .featured-row { grid-template-columns: 1fr; } }
+
+.featured-card {
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  transition: border-color .2s var(--ease), transform .2s var(--ease);
+}
+.featured-card:hover { border-color: var(--cyan-dim); transform: translateY(-2px); }
+
+.featured-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--hairline);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.featured-meta h4 {
+  margin: 0 0 4px;
+  font-size: 14.5px;
+  font-family: var(--font-display);
+}
+.featured-meta p { margin: 0; font-size: 12px; color: var(--text-dim); }
+.featured-meta .badge { margin-top: 6px; }
+
+.featured-placeholder {
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed var(--panel-border);
+  border-radius: var(--radius-lg);
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  min-height: 100px;
+}
+.featured-placeholder:hover { color: var(--cyan); border-color: var(--cyan-dim); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-mid);
+}
+.badge.ready { color: var(--mint); background: rgba(55,230,160,0.1); }
+.badge.pending { color: var(--amber); background: rgba(255,177,77,0.1); }
+
+/* =========================================================
+   Pose class cards (training)
+   ========================================================= */
+
+.pose-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.pose-card {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pose-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pose-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pose-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  background: transparent;
+  border: none;
+  color: var(--text-hi);
+  width: 100%;
+  padding: 4px 2px;
+  border-bottom: 1px solid transparent;
+}
+.pose-name:focus { outline: none; border-bottom: 1px solid var(--cyan-dim); }
+
+.pose-card-actions { display: flex; gap: 6px; }
+
+.sample-count-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.sample-count-line strong { color: var(--text-hi); }
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  max-height: 168px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.gallery-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  background: rgba(255,255,255,0.03);
+}
+.gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-item .del {
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  background: rgba(5,7,13,0.75);
+  color: var(--coral);
+  border: none;
+  font-size: 11px;
+  line-height: 18px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s var(--ease);
+}
+.gallery-item:hover .del { opacity: 1; }
+.gallery-empty {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 14px 0;
+  text-align: center;
+}
+
+.add-pose-card {
+  border: 1.5px dashed var(--panel-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  color: var(--text-mid);
+  font-family: var(--font-display);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color .2s var(--ease), color .2s var(--ease);
+}
+.add-pose-card:hover { border-color: var(--cyan-dim); color: var(--cyan); }
+
+/* =========================================================
+   Camera stage
+   ========================================================= */
+
+.stage {
+  position: sticky;
+  top: 96px;
+}
+
+.camera-frame {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 0 0 1px rgba(77,217,255,0.06), 0 30px 70px -30px rgba(0,0,0,0.8);
+}
+.camera-frame video, .camera-frame canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.camera-frame video { transform: scaleX(-1); }
+.camera-frame canvas { transform: scaleX(-1); }
+
+.camera-overlay-ui {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  pointer-events: none;
+}
+
+.detect-pill {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(5,7,13,0.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.detect-pill .pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-dim);
+}
+.detect-pill.active .pulse {
+  background: var(--mint);
+  box-shadow: 0 0 8px var(--mint);
+  animation: pulse 1.4s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(55,230,160,0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(55,230,160,0); }
+  100% { box-shadow: 0 0 0 0 rgba(55,230,160,0); }
+}
+
+.quality-stack {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.quality-item {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  background: rgba(5,7,13,0.6);
+  backdrop-filter: blur(6px);
+  color: var(--text-mid);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.quality-item.ok { color: var(--mint); }
+.quality-item.bad { color: var(--amber); }
+
+.capture-flash {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5,7,13,0.35);
+  font-family: var(--font-display);
+  font-size: 64px;
+  color: var(--cyan);
+  text-shadow: 0 0 30px var(--cyan);
+  opacity: 0;
+  pointer-events: none;
+}
+.capture-flash.show { animation: flash-seq 1.4s var(--ease) forwards; }
+@keyframes flash-seq {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.camera-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-mid);
+  text-align: center;
+  padding: 20px;
+}
+.camera-placeholder p { max-width: 34ch; font-size: 13px; margin: 0; color: var(--text-dim); }
+
+.camera-controls {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.camera-controls select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--hairline);
+  color: var(--text-hi);
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.capture-row {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.capture-row select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--hairline);
+  color: var(--text-hi);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+/* =========================================================
+   Train page grid
+   ========================================================= */
+
+.train-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 28px;
+  align-items: start;
+  margin-top: 8px;
+}
+@media (max-width: 1180px) {
+  .train-layout { grid-template-columns: 1fr; }
+  .stage { position: static; }
+}
+
+.side-panel {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.side-panel h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  margin: 0;
+}
+
+.edu-note {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-mid);
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid var(--violet-dim);
+  padding: 10px 12px;
+  border-radius: 0 8px 8px 0;
+}
+.edu-note strong { color: var(--text-hi); }
+
+/* =========================================================
+   Training progress panel
+   ========================================================= */
+
+.training-panel {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.training-log {
+  font-size: 12.5px;
+  color: var(--text-mid);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 130px;
+  overflow-y: auto;
+}
+.training-log .line.done::before { content: '✓ '; color: var(--mint); }
+.training-log .line.active { color: var(--text-hi); }
+
+.progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+  width: 0%;
+  transition: width .25s var(--ease);
+}
+
+.metric-row {
+  display: flex;
+  gap: 24px;
+}
+.metric {
+  flex: 1;
+}
+.metric .label { font-size: 11px; color: var(--text-dim); }
+.metric .value { font-family: var(--font-display); font-size: 22px; margin-top: 2px; }
+.metric .value.mint { color: var(--mint); }
+.metric .value.cyan { color: var(--cyan); }
+
+.result-banner {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(120deg, rgba(77,217,255,0.12), rgba(155,123,255,0.12));
+  border: 1px solid var(--cyan-dim);
+  text-align: center;
+}
+.result-banner h4 {
+  font-family: var(--font-display);
+  color: var(--mint);
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+.result-banner .stats {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.result-banner .stats div { font-size: 12px; color: var(--text-mid); }
+.result-banner .stats strong { display:block; font-family: var(--font-display); font-size: 18px; color: var(--text-hi); }
+
+/* =========================================================
+   Test page — prediction
+   ========================================================= */
+
+.predict-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 28px;
+  margin-top: 8px;
+  align-items: start;
+}
+@media (max-width: 1180px) { .predict-layout { grid-template-columns: 1fr; } }
+
+.prediction-card {
+  padding: 26px;
+  text-align: center;
+}
+.prediction-card .eyebrow { font-size: 12px; color: var(--text-dim); }
+.prediction-card .pose-name-big {
+  font-family: var(--font-display);
+  font-size: 34px;
+  margin: 10px 0 4px;
+  background: linear-gradient(120deg, var(--cyan), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.prediction-card .confidence-big { font-size: 14px; color: var(--text-mid); }
+.prediction-card.unknown .pose-name-big {
+  background: none;
+  -webkit-text-fill-color: initial;
+  color: var(--text-dim);
+}
+
+.conf-bars { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+.conf-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.conf-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--text-mid);
+}
+.conf-bar-label.top { color: var(--text-hi); font-weight: 700; }
+.conf-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+.conf-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+  width: 0%;
+  transition: width .18s linear;
+}
+.conf-bar-fill.top { background: linear-gradient(90deg, var(--cyan), var(--mint)); }
+
+/* =========================================================
+   Explore page
+   ========================================================= */
+
+.explore-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
+  margin-top: 8px;
+}
+@media (max-width: 1000px) { .explore-grid { grid-template-columns: 1fr; } }
+
+.summary-list { display: flex; flex-direction: column; }
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 13.5px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-row span:first-child { color: var(--text-dim); }
+.summary-row span:last-child { font-weight: 600; }
+
+.export-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+
+.py-block {
+  background: #070a13;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #c9e8ff;
+  overflow-x: auto;
+  white-space: pre;
+  display: none;
+}
+.py-block.show { display: block; }
+
+.path-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+}
+.path-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: var(--text-mid);
+}
+.path-step .n {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(155,123,255,0.14);
+  color: var(--violet);
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+}
+
+/* =========================================================
+   Toasts / modal
+   ========================================================= */
+
+.toast-stack {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+.toast {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  background: var(--panel-solid);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,0.6);
+  animation: toast-in .25s var(--ease);
+  max-width: 320px;
+}
+.toast.success { border-color: rgba(55,230,160,0.4); }
+.toast.error { border-color: rgba(255,95,126,0.4); }
+@keyframes toast-in { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(5,7,13,0.7);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 90;
+}
+.modal {
+  width: 380px;
+  padding: 24px;
+}
+.modal h3 { font-family: var(--font-display); margin: 0 0 6px; font-size: 16px; }
+.modal p { font-size: 13px; color: var(--text-mid); margin: 0 0 16px; }
+.modal input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--hairline);
+  color: var(--text-hi);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+.hidden { display: none !important; }
+
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+footer.privacy-note {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  padding: 18px 0 0;
+}
+footer.privacy-note strong { color: var(--text-mid); }
+
+/* =========================================================
+   "Your Training Poses" panel — scoped light white/blue theme.
+   Everything below only affects .training-poses-panel and its
+   children; the rest of the platform is untouched.
+   ========================================================= */
+
+.training-poses-panel {
+  background: linear-gradient(160deg, #ffffff 0%, #eef5ff 55%, #e3edfb 100%);
+  border: 1px solid #dce9fb;
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: 0 20px 45px -30px rgba(37, 99, 235, 0.35);
+}
+
+.training-poses-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.training-poses-panel-head h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  color: #0f2a55;
+  letter-spacing: 0.1px;
+}
+.training-poses-panel-head span {
+  font-size: 11.5px;
+  color: #5b76a3;
+}
+
+.training-poses-panel .pose-grid {
+  margin-top: 0;
+}
+
+.training-poses-panel .pose-card {
+  background: #ffffff;
+  border: 1px solid #dfe9f9;
+  box-shadow: 0 10px 26px -18px rgba(30, 64, 175, 0.25);
+}
+.training-poses-panel .pose-card:hover {
+  border-color: #bcd4f7;
+}
+
+.pose-ref-image-wrap {
+  background: linear-gradient(160deg, #f2f7ff, #e6eefc);
+  border: 1px solid #e2ebfa;
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+}
+.pose-ref-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.training-poses-panel .pose-card-head {
+  padding-top: 2px;
+}
+
+.training-poses-panel .pose-name-static {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #10254a;
+  margin: 0;
+}
+
+.training-poses-panel .sample-count-line {
+  color: #6c81a6;
+  font-size: 11px;
+}
+.training-poses-panel .sample-count-line strong { color: #10254a; }
+
+.training-poses-panel .gallery-item {
+  background: #f3f7fd;
+  border-color: #e3ecfb;
+}
+
+.training-poses-panel .btn-primary {
+  font-size: 12.5px;
+  padding: 9px 16px;
+}
+
+.training-poses-panel .add-pose-card {
+  border: 1.5px dashed #c9daf5;
+  color: #5b76a3;
+  background: #f7faff;
+  font-size: 13px;
+}
+.training-poses-panel .add-pose-card:hover {
+  border-color: #93b6ef;
+  color: #2563eb;
+}
+
+.training-poses-panel .icon-btn {
+  background: #f3f7fd;
+  border-color: #e3ecfb;
+  color: #7d8bab;
+}
+.training-poses-panel .icon-btn:hover {
+  color: #2563eb;
+  border-color: #bcd4f7;
+}

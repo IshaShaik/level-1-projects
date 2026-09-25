@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Test — Yoga Pose Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="test">
+
+<header class="lab-header">
+  <div id="header-root"></div>
+</header>
+
+<main class="shell">
+  <section class="hero">
+    <h2>Live AI Pose Recognition</h2>
+    <p class="lede">Strike a pose in front of your camera and watch the trained model classify it in real time.</p>
+  </section>
+
+  <div class="glass empty-state hidden" id="not-trained-message">
+    <p>This project doesn't have a trained model yet. Head to the Train page, capture samples for at least two poses, and train a model first.</p>
+    <a class="btn btn-primary" href="train.html" style="margin-top: 10px;">GO TO TRAIN</a>
+  </div>
+
+  <div class="predict-layout hidden" id="predict-area">
+    <div class="stage">
+      <div class="camera-frame" id="camera-frame">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="camera-canvas"></canvas>
+        <div class="camera-overlay-ui">
+          <div class="detect-pill" id="detect-pill"><span class="pulse"></span>POSE DETECTION ACTIVE</div>
+        </div>
+        <div class="camera-placeholder" id="camera-placeholder">
+          <p>Allow camera access to start live recognition.</p>
+          <button class="btn btn-primary" id="btn-start-camera">ENABLE CAMERA</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap: 18px;">
+      <div class="prediction-card glass glass-glow" id="prediction-card">
+        <div class="eyebrow">Detected Pose</div>
+        <div class="pose-name-big" id="pose-name-big">—</div>
+        <div class="confidence-big" id="confidence-big">Waiting for camera…</div>
+      </div>
+
+      <div class="glass" style="padding: 20px;">
+        <h3 style="font-family: var(--font-display); font-size: 14.5px; margin: 0 0 14px;">Confidence by pose</h3>
+        <div class="conf-bars" id="conf-bars"></div>
+      </div>
+
+      <div class="edu-note">
+        <strong>What is prediction?</strong> The trained model looks at your current pose's landmarks and decides which class it most resembles. Below 60% confidence, it says "unknown" instead of guessing.
+      </div>
+    </div>
+  </div>
+
+  <footer class="privacy-note">
+    <strong>Camera processing happens locally in your browser.</strong> Nothing here is uploaded anywhere.
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

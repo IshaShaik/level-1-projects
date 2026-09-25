@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Explore — Yoga Pose Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="explore">
+
+<header class="lab-header">
+  <div id="header-root"></div>
+</header>
+
+<main class="shell">
+  <section class="hero">
+    <h2>Explore Your AI Model</h2>
+    <p class="lede">A summary of what your model has learned, plus ways to take it beyond the browser.</p>
+  </section>
+
+  <div class="explore-grid">
+    <div class="glass" style="padding: 22px;">
+      <h3 style="font-family: var(--font-display); font-size: 15px; margin: 0 0 10px;">Model Summary</h3>
+      <div class="summary-list">
+        <div class="summary-row"><span>Model Name</span><span id="sum-name">—</span></div>
+        <div class="summary-row"><span>Pose Classes</span><span id="sum-classes">—</span></div>
+        <div class="summary-row"><span>Training Samples</span><span id="sum-samples">—</span></div>
+        <div class="summary-row"><span>Model Type</span><span>TensorFlow.js Neural Network</span></div>
+        <div class="summary-row"><span>Pose Detection</span><span>MediaPipe Pose Landmarker</span></div>
+        <div class="summary-row"><span>Status</span><span id="sum-status">—</span></div>
+      </div>
+
+      <div class="export-actions">
+        <button class="btn btn-primary btn-block" id="btn-export-model">EXPORT MODEL</button>
+        <button class="btn btn-block" id="btn-export-data">EXPORT TRAINING DATA</button>
+      </div>
+    </div>
+
+    <div class="glass" style="padding: 22px;">
+      <h3 style="font-family: var(--font-display); font-size: 15px; margin: 0 0 10px;">Take Your Model Further</h3>
+      <p style="font-size: 12.5px; color: var(--text-mid); margin: 0;">
+        This app combines MediaPipe pose landmarks with a small machine-learning classifier. The exact
+        TensorFlow.js model can't run directly inside Python, but you can rebuild the same idea there —
+        here's the learning path.
+      </p>
+      <div class="path-steps">
+        <div class="path-step"><div class="n">1</div>Export your training data as JSON.</div>
+        <div class="path-step"><div class="n">2</div>Understand the landmark features — 33 body points, each with x, y, z.</div>
+        <div class="path-step"><div class="n">3</div>Install MediaPipe in Python (<code>pip install mediapipe</code>).</div>
+        <div class="path-step"><div class="n">4</div>Collect pose landmarks from your own webcam using OpenCV + MediaPipe.</div>
+        <div class="path-step"><div class="n">5</div>Train a Python classifier (e.g. scikit-learn or a small Keras model) on the landmark vectors.</div>
+        <div class="path-step"><div class="n">6</div>Test it live through your webcam, the same way this app does.</div>
+      </div>
+      <button class="btn btn-block" id="btn-python-guide">VIEW PYTHON STARTER CODE</button>
+      <div class="py-block" id="python-block"># pose_starter.py
+# Educational starting point — mirrors the browser app's approach:
+# MediaPipe landmarks in, a simple classifier out.
+
+import cv2
+import mediapipe as mp
+import numpy as np
+import json
+
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose(static_image_mode=False)
+
+def normalize(landmarks):
+    pts = np.array([[p.x, p.y, p.z] for p in landmarks])
+    hip = (pts[23] + pts[24]) / 2
+    shoulder = (pts[11] + pts[12]) / 2
+    torso = np.linalg.norm(shoulder[:2] - hip[:2]) or 1.0
+    return ((pts - hip) / torso).flatten()
+
+# 1. Collect samples for each pose class into a list of (label, features)
+dataset = []
+
+cap = cv2.VideoCapture(0)
+while True:
+    ok, frame = cap.read()
+    if not ok:
+        break
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    result = pose.process(rgb)
+
+    if result.pose_landmarks:
+        features = normalize(result.pose_landmarks.landmark)
+        # Press a key to label + save a sample, e.g.:
+        # dataset.append({"label": "tree_pose", "features": features.tolist()})
+
+    cv2.imshow("Pose Capture", frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+
+# 2. Train a simple classifier, e.g. with scikit-learn:
+#
+# from sklearn.neural_network import MLPClassifier
+# X = [d["features"] for d in dataset]
+# y = [d["label"] for d in dataset]
+# clf = MLPClassifier(hidden_layer_sizes=(32,), max_iter=500)
+# clf.fit(X, y)
+#
+# Then reuse the same normalize() function at prediction time
+# on new webcam frames to classify live poses.
+</div>
+    </div>
+  </div>
+
+  <footer class="privacy-note">
+    <strong>Camera processing happens locally in your browser.</strong> Exports only ever contain landmark data and small thumbnails you already captured.
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
